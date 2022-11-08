@@ -10,11 +10,18 @@ public class Dealer {
 	private String username;
 	private String password;
 	private String message;
+	private String salt;
 	
 	
 	
 	 
 	
+	public String getSalt() {
+		return salt;
+	}
+	public void setSalt(String salt) {
+		this.salt = salt;
+	}
 	public String getMessage() {
 		return message;
 	}

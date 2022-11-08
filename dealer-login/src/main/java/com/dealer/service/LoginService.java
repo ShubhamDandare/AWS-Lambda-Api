@@ -12,8 +12,6 @@ import java.util.Objects;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.dealer.entity.Dealer;
 import com.dealer.exception.InvalidCredentialsException;
@@ -30,50 +28,49 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 public class LoginService {
 //creating dynamoDb Enhanced client
 	private DynamoDbEnhancedClient client;
+	private String tableName;
 
 	public LoginService(DynamoDbClient client, Context context) {
 		this.client = DynamoDbEnhancedClient.builder().dynamoDbClient(client).build();
+		this.tableName =System.getenv("tableName");
+		//this.tableName = context.getClientContext().getEnvironment().get("tableName");
 	}
 
 	// Login Table Created
 //	static final TableSchema<Dealer> DEALER_LOGIN_TABLE = TableSchema.fromClass(Dealer.class);
 //	DynamoDbTable<Dealer> LoginTable = client.table("Dealer_2022", DEALER_LOGIN_TABLE);
 
-	public Dealer login(Dealer dealerInput) throws NoSuchAlgorithmException, InvalidKeySpecException,RuntimeException{
- 
-		Dealer dealer=new Dealer();
+	public Dealer login(Dealer dealerInput) {
+
+		Dealer dealer = new Dealer();
 		// Login Table Created
 		DynamoDbTable<Dealer> table = getDealerTable();
 
 		Dealer item = table.getItem(Key.builder().partitionValue(dealerInput.getUsername()).build());
-		if(item!=null) {	
-			
+		if (item != null) {
+
 			String encodePassword = item.getPassword();
-			String hashpassword = hashpassword(encodePassword, null);
-			
-			if(encodePassword.equals(hashpassword) ) {
-				//System.out.println("login successfull");
-			
+			String hashpassword = hashpassword(dealerInput.getPassword(), item.getSalt());
+
+			if (encodePassword.equals(hashpassword)) {
+				// System.out.println("login successfull");
+
 				dealer.setMessage("login successfull");
 				dealer.setId(item.getId());
-				
-			}
-			else {
+				return dealer;
+			} 
 			
-				//dealer.setMessage("Invalid username & password . .");
-				throw new InvalidCredentialsException("Invalid username & password . .");
-			}
 		}
+		throw new InvalidCredentialsException("Invalid username & password . .");
+
 		
-		return dealer;
 	}
 
 	public DynamoDbTable<Dealer> getDealerTable() {
-		return client.table("dealer", TableSchema.fromClass(Dealer.class));
+		return client.table(this.tableName, TableSchema.fromClass(Dealer.class));
 	}
 
-	public String hashpassword(String password, String hashSalt)
-			throws NoSuchAlgorithmException, InvalidKeySpecException {
+	public String hashpassword(String password, String hashSalt) {
 		byte[] salt = null;
 
 		if (hashSalt == null) {
@@ -86,12 +83,18 @@ public class LoginService {
 		}
 
 		KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
-		SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-		byte[] hash = factory.generateSecret(spec).getEncoded();
-
-		String hashpassword = Base64.getEncoder().encodeToString(hash);
-		System.out.println(Base64.getEncoder().encodeToString(hash));
-		System.out.println(Base64.getEncoder().encodeToString(salt));
+		SecretKeyFactory factory;
+		String hashpassword = "empty";
+		try {
+			factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+			byte[] hash = factory.generateSecret(spec).getEncoded();
+			hashpassword = Base64.getEncoder().encodeToString(hash);
+			System.out.println(Base64.getEncoder().encodeToString(hash));
+			System.out.println(Base64.getEncoder().encodeToString(salt));
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return hashpassword;
 	}
@@ -100,7 +103,6 @@ public class LoginService {
 
 		DynamoDbTable<Dealer> table = getDealerTable();
 		table.putItem(dealer);
-		
 
 		if (Objects.nonNull(table)) {
 			return "Dealer Added successfuly";
@@ -110,21 +112,17 @@ public class LoginService {
 
 	}
 
-	
-	
-	public Dealer getDealerDeatils(String key,Dealer dealer) {
-	
+	public Dealer getDealerDeatils(String key, Dealer dealer) {
+
 		DynamoDbTable<Dealer> table = getDealerTable();
-	//	fetching data from db with the help of key pattern
+		// fetching data from db with the help of key pattern
 		Key usernameKey = Key.builder().partitionValue(dealer.getUsername()).build();
-		
-		Dealer item = table.getItem(
-                (GetItemEnhancedRequest.Builder requestBuilder) -> requestBuilder.key(usernameKey));
-	//	Map<K, V>
-	//	table.scan((t)->t.addAttributeToProject(key).filterExpression(Expression.builder().expressionNames("username")));
-	
-		
-		if(Objects.nonNull(item)) {
+
+		Dealer item = table.getItem((GetItemEnhancedRequest.Builder requestBuilder) -> requestBuilder.key(usernameKey));
+		// Map<K, V>
+		// table.scan((t)->t.addAttributeToProject(key).filterExpression(Expression.builder().expressionNames("username")));
+
+		if (Objects.nonNull(item)) {
 			dealer.setId(item.getId());
 			dealer.setUsername(item.getUsername());
 			dealer.setPassword(item.getPassword());
@@ -133,6 +131,5 @@ public class LoginService {
 		return null;
 
 	}
-	
-	
+
 }

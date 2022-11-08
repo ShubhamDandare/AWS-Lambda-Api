@@ -1,14 +1,7 @@
 package com.dealer;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.dealer.entity.Dealer;
 import com.dealer.exception.InvalidCredentialsException;
 import com.dealer.service.LoginService;
@@ -24,7 +17,7 @@ import software.amazon.awssdk.utils.StringUtils;
  *      href=https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html>Lambda
  *      Java Handler</a> for more information
  */
-public class App implements RequestHandler<Dealer, Dealer>, RequestStreamHandler {
+public class App implements RequestHandler<Dealer, Dealer> {
 
 	private final DynamoDbClient dynamoDbClient;
 
@@ -43,26 +36,23 @@ public class App implements RequestHandler<Dealer, Dealer>, RequestStreamHandler
 	public Dealer handleRequest(final Dealer input, final Context context) {
 		// TODO: invoking the api call using dynamoDbClient.
 		// context.getClientContext().getEnvironment();
+		context.getLogger().log("Lambda function start......");
 		LoginService loginService = new LoginService(dynamoDbClient, context);
-		
+	
+		context.getLogger().log(input.getUsername());
+		//context.getLogger().log(input.getUsername());
 		if (StringUtils.isEmpty(input.getUsername()) || StringUtils.isEmpty(input.getPassword())) {
 			throw new InvalidCredentialsException("username or password is empty");
 
 		}
 
-		try {
+		
 			Dealer login = loginService.login(input);
+		
 			return login;
-		} catch (NoSuchAlgorithmException | InvalidKeySpecException | RuntimeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+		
+		
 	}
 
-	@Override
-	public void handleRequest(InputStream input, OutputStream output, Context context) throws IOException {
-		// TODO Auto-generated method stub
-
-	}
+	
 }
