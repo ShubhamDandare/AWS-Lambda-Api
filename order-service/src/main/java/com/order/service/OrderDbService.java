@@ -22,6 +22,9 @@ import software.amazon.awssdk.enhanced.dynamodb.Expression;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.GetItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -88,12 +91,19 @@ public class OrderDbService {
 				int nextInt = random.nextInt(99999);
 				String orderId = String.format("%05d", nextInt);
 
-				OrderDetails deatDetails = new OrderDetails(orderId, content.get(0), dealerId, content.get(1),
+				OrderDetails Details = new OrderDetails(orderId, content.get(0), dealerId, content.get(1),
 						content.get(2), content.get(3), content.get(4), content.get(5), content.get(6), "Received");
-				orderList.add(deatDetails);
+				orderList.add(Details);
 			}
 		}
 		return orderList;
+	}
+
+	public String generateOrderId() {
+		Random random = new Random();
+		int nextInt = random.nextInt(99999);
+		String orderId = String.format("%05d", nextInt);
+		return orderId;
 	}
 
 	public List<OrderDetails> getConvertedToOrder(OrderRequest request) {
@@ -111,7 +121,7 @@ public class OrderDbService {
 
 		Map<String, AttributeValue> mapValue = new HashMap<>();
 
-		mapValue.put(":value", AttributeValue.builder().s("Received").build());
+		mapValue.put(":value", AttributeValue.builder().s("Order_Received").build());
 
 		Expression expression = Expression.builder().expressionNames(mapName).expressionValues(mapValue).build();
 
@@ -133,7 +143,7 @@ public class OrderDbService {
 			Key key = Key.builder().partitionValue(partitionKey).sortValue(sortKey).build();
 			Order item = orderTable.getItem((GetItemEnhancedRequest.Builder requestBuilder) -> requestBuilder.key(key));
 
-			item.setOrderStatus("Initiated");
+			item.setOrderStatus("Initiated_Order");
 			orderTable.updateItem(item);
 		} catch (DynamoDbException e) {
 			throw new OrderInitiateException("fail to update order status as Initiated");
@@ -148,7 +158,7 @@ public class OrderDbService {
 			Key key = Key.builder().partitionValue(details.getDealerId())
 					.sortValue(details.getCustomerId() + "#" + details.getOrderId()).build();
 			Order item = orderTable.getItem((GetItemEnhancedRequest.Builder requestBuilder) -> requestBuilder.key(key));
-			item.setOrderStatus("Processed");
+			item.setOrderStatus("Processed_Order");
 			item.setExpectedDeliveryDate(item.getExpectedDeliveryDate());
 			item.setPrice(item.getPrice());
 			orderTable.updateItem(item);
@@ -157,4 +167,29 @@ public class OrderDbService {
 		}
 
 	}
+
+	public List<Order> fetchAllorder(String dealerId, String customerId, String orderId) {
+		DynamoDbTable<Order> orderTable = getOrderTable();
+		Key key = Key.builder().partitionValue(dealerId).sortValue(customerId + "#" + orderId).build();
+		Order item = orderTable.getItem((GetItemEnhancedRequest.Builder requestBuilder) -> requestBuilder.key(key));
+
+		List<Order> list = new ArrayList<>();
+		list.add(item);
+		return list;
+
+	}
+
+	public List<Order> fetchAllorder(String dealerId) {
+		DynamoDbTable<Order> orderTable = getOrderTable();
+		QueryConditional conditional = QueryConditional.keyEqualTo(Key.builder().partitionValue(dealerId).build());
+		// PageIterable<Order> query =
+		// orderTable.query(QueryEnhancedRequest.builder().queryConditional(conditional).build());
+		Iterator<Order> iterator = orderTable.query(conditional).items().iterator();
+		List<Order> order = new ArrayList<>();
+		while (iterator.hasNext()) {
+			order.add(iterator.next());
+		}
+		return order;
+	}
+
 }

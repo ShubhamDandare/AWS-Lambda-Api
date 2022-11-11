@@ -15,6 +15,7 @@ public class SQSService {
 	private final SqsClient sqsClient;
 	private final Context context;
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	//todo update sqs_url url 
 	private final String SQS_URL = "";
 
 	public SQSService(SqsClient sqsClient, Context context) {

@@ -1,40 +1,63 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { SigninServiceService } from '../signin-service.service';
 //import { NotificationService } from "./notification.service";
 import { NotificationsService, SimpleNotificationsModule } from 'angular2-notifications';
+import { SaveOrderService } from '../save-order.service';
+import { Observable, ReplaySubject } from 'rxjs';
 
 @Component({
   selector: 'app-signin',
   templateUrl: './signin.component.html',
   styleUrls: ['./signin.component.css']
 })
-export class SigninComponent implements OnInit {
-  //success : boolean = false ;
-  dealer={
-    username:"",
-    password:""
- }
- signin(){
-  const observable=this.signinservice.signin(this.dealer);
-  observable.subscribe(
-    
-    (Response:any)=>{
-      console.log(Response);
-      sessionStorage.setItem("dealer",JSON.stringify(Response));
-      this.notification.success("Login success")
-    }
- ,
- function(error){
-  alert(error)
- },()=>{
+export class SigninComponent implements OnInit{
+  fileContent : string | undefined;
 
-
-})
-}
-  constructor(private signinservice:SigninServiceService,private router:Router,private notification:NotificationsService) { }
-
-  ngOnInit(): void {
+  onFileSelected(event : any) {
+    this.convertFile(event.target.files[0]).subscribe((base64: string | undefined) => {
+      this.fileContent = base64;
+      this.uploadFile();
+    });
   }
 
+  uploadFile() {
+    const observable = this.orderService.uploadFile(this.fileContent) ;
+      observable.subscribe(
+        (response : any) => {
+          let navigationExtras: NavigationExtras = {
+            state: {
+              ordersList: response
+            }
+          };
+          this.router.navigate(['orderDashboard'], navigationExtras);
+         alert("File upload Success");
+        },(error) => {
+          alert(error);
+        }
+      )
+    
+  }
+
+  convertFile(file : File) : Observable<string> {
+    const result = new ReplaySubject<string>(1);
+    const reader = new FileReader();
+    reader.readAsBinaryString(file);
+    reader.onload = (event:any) => result.next(btoa(event.target.result.toString()));
+    return result;
+  }
+
+  constructor(private  orderService: SaveOrderService,
+    private router: Router) { }
+
+  
+  ngOnInit(): void {
+  }
 }
+
+
+  
+
+ 
+
+

@@ -9,6 +9,12 @@ import { HeaderComponent } from './header/header.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './login/login.component';
+import { OrderSubmissionComponent } from './order-submission/order-submission.component';
+import { OrderDashboardComponent } from './order-dashboard/order-dashboard.component';
+import { CsvparserComponent } from './csvparser/csvparser.component';
+//import { NgxCsvParserModule } from 'ngx-csv-parser';
+//import { NgxCsvParserModule } from 'ngx-csv-parser';
+// import { OrderSubmissionComponent } from './order-submission/order-submission.component';
 //import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
@@ -17,12 +23,16 @@ import { LoginComponent } from './login/login.component';
     SigninComponent,
     SignupComponent,
     HeaderComponent,
-    LoginComponent
+    LoginComponent,
+    OrderSubmissionComponent,
+    OrderDashboardComponent,
+    CsvparserComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+  
 
     HttpClientModule
      
