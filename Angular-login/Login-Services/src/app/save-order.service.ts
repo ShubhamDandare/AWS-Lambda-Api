@@ -8,7 +8,8 @@ import { catchError } from 'rxjs/operators';
 })
 export class SaveOrderService {
 
-  BASE_URL="https://ju47zm5mz4.execute-api.ap-northeast-1.amazonaws.com//saveorder";
+ 
+  BASE_URL= "https://yumszrjbyg.execute-api.ap-northeast-1.amazonaws.com/v1"
   dealer = JSON.parse(sessionStorage.getItem("dealer") || '{}');
 
   order = {
@@ -22,15 +23,32 @@ export class SaveOrderService {
     orderId: "",
     orderStatus: ""
   }
-
-  uploadFile(fileContent : string | undefined ){
+ 
+  uploadFile(objectKey : string | undefined ){
     const fileInput = {
-      fileContent: fileContent,
-      dealerId : this.dealer.dealerId
+      objectKey : objectKey,
+    
+    
+      dealerId : this.dealer.id
+
     }
+   
     return this.http.post(this.BASE_URL+'/saveorder', fileInput).pipe(catchError(this.errorHandler));
   }
-  
+ 
+  editOrder(order: any) {
+    return this.http.put(this.BASE_URL + '/updateorder', order).pipe(catchError(this.errorHandler));
+  }
+
+  fetchOrders(customerId : string , orderId : string, showAll : Boolean) {
+    const orderInput = {
+      "customerId":customerId,
+      "orderId":orderId,
+      "dealerId":this.dealer.id,
+      "showAll": showAll
+    }
+    return this.http.post(this.BASE_URL+'/orderlist', orderInput).pipe(catchError(this.errorHandler));
+  }
 
 
   errorHandler(error: HttpErrorResponse) {

@@ -1,10 +1,7 @@
 <p>order-dashboard works!</p>
-<div class = "dashboard">
-    <button class="btn btn-primary" (click)="uploadFile()">Upload File</button>
-    
-</div>
 
-<div class="ordersList" *ngIf="ordersList.length > 0">
+
+<div class="convertedToOrder" *ngIf="convertedToOrder.length > 0">
     <br/>
     <h3>Current Uploaded Orders</h3>
     <table class="table table-striped table-bordered">
@@ -23,7 +20,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let order of ordersList">
+            <tr *ngFor="let order of convertedToOrder">
                 <td>{{order.make}}</td>
                 <td>{{order.model}}</td>
                 <td>{{order.year}}</td>
@@ -33,8 +30,12 @@
                 <td>{{order.city}}</td>
                 <td>{{order.orderId}}</td>
                 <td>{{order.orderStatus}}</td>
-               
+                <td><button  class="btn btn-primary" type="submit" (click)="edit(order)">Edit</button></td>
             </tr>
         </tbody>
     </table>
+    <div class = "dashboard">
+        <button class="btn btn-primary" (click)="uploadFile()">Upload File</button>
+        
+    </div>
 </div>

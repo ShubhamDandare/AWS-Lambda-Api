@@ -3,6 +3,7 @@ package com.order.service;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.gson.Gson;
@@ -35,14 +36,19 @@ public class S3Service {
 
 		String fileName = orderDetails.getDealerId() + "_" + orderDetails.getCustomerId() + "_"
 				+ orderDetails.getOrderId();
+		String customerIdAndOrderId = orderDetails.getCustomerId() + "_" + orderDetails.getOrderId();
+		try {
+			PutObjectRequest objectRequest = PutObjectRequest.builder().bucket("sgd-orderbucket").key(fileName).build();
 
-		PutObjectRequest objectRequest = PutObjectRequest.builder().bucket("dealer-orders").key(fileName).build();
+			s3Client.putObject(objectRequest, RequestBody.fromString(gson.toJson(orderDetails)));
+			Order order = new Order(orderDetails.getDealerId(), customerIdAndOrderId, "sgd-orderbucket", fileName,
+					orderDetails.getOrderStatus());
+			return order;
 
-		s3Client.putObject(objectRequest, RequestBody.fromString(gson.toJson(orderDetails)));
-		Order order = new Order(orderDetails.getDealerId(),
-				orderDetails.getCustomerId() + "#" + orderDetails.getOrderId(), "dealer-orders", fileName,
-				orderDetails.getOrderStatus());
-		return order;
+		} catch (Exception e) {
+			context.getLogger().log("Exception in S3 : " + e.getMessage());
+			throw new RuntimeException("File Upload failed");
+		}
 	}
 
 	// fetch file

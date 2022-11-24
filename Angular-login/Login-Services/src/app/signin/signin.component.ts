@@ -17,6 +17,8 @@ export class SigninComponent implements OnInit{
   onFileSelected(event : any) {
     this.convertFile(event.target.files[0]).subscribe((base64: string | undefined) => {
       this.fileContent = base64;
+      console.log(this.fileContent )
+      
       this.uploadFile();
     });
   }
@@ -25,12 +27,13 @@ export class SigninComponent implements OnInit{
     const observable = this.orderService.uploadFile(this.fileContent) ;
       observable.subscribe(
         (response : any) => {
+          console.log('response***********'+response)
           let navigationExtras: NavigationExtras = {
             state: {
               ordersList: response
             }
           };
-          this.router.navigate(['orderDashboard'], navigationExtras);
+          this.router.navigate(['orderdashboard'], navigationExtras);
          alert("File upload Success");
         },(error) => {
           alert(error);

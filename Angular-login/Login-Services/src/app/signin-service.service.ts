@@ -28,13 +28,6 @@ export class SigninServiceService {
     signup(dealer:{username:String,password:String}){
       return this.http.post(this.Sign_Up_URL,dealer)}
 
-      isLoggedIn(): boolean {
-        let dealer = JSON.parse(sessionStorage.getItem("dealer") || '{}');
-        if(dealer != null ) {
-          return true;
-        }
-        return false;
-      }
- 
+      
       constructor(private http: HttpClient) { }
 }

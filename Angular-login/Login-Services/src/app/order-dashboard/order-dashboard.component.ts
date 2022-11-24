@@ -10,17 +10,24 @@ import { SaveOrderService } from '../save-order.service';
   styleUrls: ['./order-dashboard.component.css']
 })
 export class OrderDashboardComponent implements OnInit {
-  ordersList : Array <any> = [];
+  convertedToOrder : Array <any> = [];
   
   uploadFile() {
     this.router.navigate(['uploadfile']);
   }
 
-  
+  edit(order: any){
+    let navigationExtras: NavigationExtras = {
+      state: {
+        order: order
+      }
+    };
+    this.router.navigate(['updateorder'], navigationExtras);
+  }
   
   constructor(private router : Router, private service :SaveOrderService) {
-    if(history.state.ordersList){
-      this.ordersList = history.state.ordersList;
+    if(history.state.convertedToOrder){
+      this.convertedToOrder = history.state.convertedToOrder;
     }
    }
   ngOnInit(): void {

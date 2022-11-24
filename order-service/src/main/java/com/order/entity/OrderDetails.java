@@ -146,4 +146,10 @@ public class OrderDetails {
 		this.orderStatus = orderStatus;
 	}
 
+	public OrderDetails() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+
 }

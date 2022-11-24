@@ -18,6 +18,9 @@ login(){
     
     (Response:any)=>{
       console.log(Response);
+      sessionStorage.setItem("dealer", JSON.stringify(Response));
+      this.router.navigate(['uploadfile'])
+      alert("Login Success")
     }
 ,
 function(error){

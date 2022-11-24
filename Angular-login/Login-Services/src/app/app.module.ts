@@ -12,6 +12,8 @@ import { LoginComponent } from './login/login.component';
 import { OrderSubmissionComponent } from './order-submission/order-submission.component';
 import { OrderDashboardComponent } from './order-dashboard/order-dashboard.component';
 import { CsvparserComponent } from './csvparser/csvparser.component';
+import { OrderUpdateComponent } from './order-update/order-update.component';
+import { OrderSearchComponent } from './order-search/order-search.component';
 //import { NgxCsvParserModule } from 'ngx-csv-parser';
 //import { NgxCsvParserModule } from 'ngx-csv-parser';
 // import { OrderSubmissionComponent } from './order-submission/order-submission.component';
@@ -26,7 +28,9 @@ import { CsvparserComponent } from './csvparser/csvparser.component';
     LoginComponent,
     OrderSubmissionComponent,
     OrderDashboardComponent,
-    CsvparserComponent
+    CsvparserComponent,
+    OrderUpdateComponent,
+    OrderSearchComponent
   ],
   imports: [
     BrowserModule,

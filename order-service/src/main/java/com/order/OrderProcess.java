@@ -17,8 +17,8 @@ public class OrderProcess {
 		dynamoDbClient = DependencyFactory.dynamoDbClient();
 	}
 
-	public void handleRequest(OrderDetails orderDetails, Context context) {
-		OrderDbService dbService = new OrderDbService(dynamoDbClient, context);
-		dbService.processOrder(orderDetails);
-	}
+//	public void handleRequest(OrderDetails orderDetails, Context context) {
+//		OrderDbService dbService = new OrderDbService(dynamoDbClient, context);
+//		dbService.processOrder(orderDetails);
+//	}
 }

@@ -1,34 +1,31 @@
 package com.order.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.order.entity.Order;
 import com.order.entity.OrderDetails;
-import com.order.entity.OrderRequest;
 import com.order.exception.OrderInitiateException;
 import com.order.exception.OrderUpdateException;
 
+import software.amazon.awssdk.core.internal.waiters.ResponseOrException;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Expression;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.GetItemEnhancedRequest;
-import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
-import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.DescribeTableResponse;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
+import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
 import software.amazon.awssdk.utils.StringUtils;
 
 public class OrderDbService {
@@ -38,11 +35,36 @@ public class OrderDbService {
 
 	public OrderDbService(DynamoDbClient client, Context context) {
 		this.client = DynamoDbEnhancedClient.builder().dynamoDbClient(client).build();
+
 	}
 
 	public DynamoDbTable<Order> getOrderTable() {
-		return client.table("order", TableSchema.fromClass(Order.class));
+		return client.table("order-detail", TableSchema.fromBean(Order.class));
 	}
+//	 public static  DynamoDbTable<Order> createTable(DynamoDbEnhancedClient  client) {
+//	        // Create a DynamoDbTable object
+//	        DynamoDbTable<Order> customerTable = client.table("order-detail", TableSchema.fromBean(Order.class));
+//	        // Create the table
+//	        customerTable.createTable(builder -> builder
+//	                .provisionedThroughput(b -> b
+//	                        .readCapacityUnits(10L)
+//	                        .writeCapacityUnits(10L)
+//	                        .build())
+//	        );
+//
+//	        System.out.println("Waiting for table creation...");
+//
+//	        try (DynamoDbWaiter waiter = DynamoDbWaiter.create()) { // DynamoDbWaiter is Autocloseable
+//	            ResponseOrException<DescribeTableResponse> response = waiter
+//	                    .waitUntilTableExists(builder -> builder.tableName("order-detail").build())
+//	                    .matched();
+//	            DescribeTableResponse tableDescription = response.response().orElseThrow(
+//	                    () -> new RuntimeException("order-detail table was not created."));
+//	            // The actual error can be inspected in response.exception()
+//	            System.out.println(tableDescription.table().tableName() + " was created.");
+//	        }
+//	        return customerTable;
+//	    }
 
 	public void saveOrder(Order order) {
 
@@ -50,8 +72,14 @@ public class OrderDbService {
 			DynamoDbTable<Order> orderTable = getOrderTable();
 			orderTable.putItem(order);
 
+			// DynamoDbTable<Order> createTable = createTable(client);
+
+			// createTable.putItem(order);
+
 		} catch (DynamoDbException e) {
-			context.getLogger().log(e.getMessage());
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		//	context.getLogger().log(e.getMessage());
 		}
 
 	}
@@ -66,7 +94,7 @@ public class OrderDbService {
 		Order item = orderTable.getItem((GetItemEnhancedRequest.Builder request) -> request.key(key));
 		context.getLogger().log(item.getOrderStatus());
 
-		if (StringUtils.equals(item.getOrderStatus(), "Received")) {
+		if (StringUtils.equals(item.getOrderStatus(), "Order_Received")) {
 			return true;
 		} else {
 			return false;
@@ -74,44 +102,12 @@ public class OrderDbService {
 
 	}
 
-	public List<OrderDetails> parseJavaObjtoJson(String fileinput, String dealerId) {
-		List<OrderDetails> orderList = new ArrayList<>();
-
-		String[] line = fileinput.split(System.lineSeparator());
-
-		List<String> topHeader = Arrays.asList(line[0].split(","));
-
-		for (int i = 1; i <= line.length; i++) {
-			List<String> content = Arrays.asList(line[i].split(","));
-			if (content.size() != topHeader.size()) {
-				return null;
-
-			} else {
-				Random random = new Random();
-				int nextInt = random.nextInt(99999);
-				String orderId = String.format("%05d", nextInt);
-
-				OrderDetails Details = new OrderDetails(orderId, content.get(0), dealerId, content.get(1),
-						content.get(2), content.get(3), content.get(4), content.get(5), content.get(6), "Received");
-				orderList.add(Details);
-			}
-		}
-		return orderList;
-	}
-
-	public String generateOrderId() {
-		Random random = new Random();
-		int nextInt = random.nextInt(99999);
-		String orderId = String.format("%05d", nextInt);
-		return orderId;
-	}
-
-	public List<OrderDetails> getConvertedToOrder(OrderRequest request) {
-		Base64.Decoder decoder = Base64.getMimeDecoder();
-		byte[] decodedBytes = decoder.decode(request.getObjectKey());
-		String str = new String(decodedBytes);
-		return parseJavaObjtoJson(str, request.getDealerId());
-	}
+//		public String generateOrderId() {
+//		Random random = new Random();
+//		int nextInt = random.nextInt(99999);
+//		String orderId = String.format("%05d", nextInt);
+//		return orderId;
+//	}
 
 	public List<Order> scanOrderStatus() {
 		DynamoDbTable<Order> orderTable = getOrderTable();
@@ -151,22 +147,22 @@ public class OrderDbService {
 
 	}
 
-	public void processOrder(OrderDetails details) {
-
-		try {
-			DynamoDbTable<Order> orderTable = getOrderTable();
-			Key key = Key.builder().partitionValue(details.getDealerId())
-					.sortValue(details.getCustomerId() + "#" + details.getOrderId()).build();
-			Order item = orderTable.getItem((GetItemEnhancedRequest.Builder requestBuilder) -> requestBuilder.key(key));
-			item.setOrderStatus("Processed_Order");
-			item.setExpectedDeliveryDate(item.getExpectedDeliveryDate());
-			item.setPrice(item.getPrice());
-			orderTable.updateItem(item);
-		} catch (Exception e) {
-			throw new OrderUpdateException("fail to update order process initiated");
-		}
-
-	}
+//	public void processOrder(OrderDetails details) {
+//
+//		try {
+//			DynamoDbTable<Order> orderTable = getOrderTable();
+//			Key key = Key.builder().partitionValue(details.getDealerId())
+//					.sortValue(details.getCustomerId() + "#" + details.getOrderId()).build();
+//			Order item = orderTable.getItem((GetItemEnhancedRequest.Builder requestBuilder) -> requestBuilder.key(key));
+//			item.setOrderStatus("Processed_Order");
+//			item.setExpectedDeliveryDate(item.getExpectedDeliveryDate());
+//			item.setPrice(item.getPrice());
+//			orderTable.updateItem(item);
+//		} catch (Exception e) {
+//			throw new OrderUpdateException("fail to update order process initiated");
+//		}
+//
+//	}
 
 	public List<Order> fetchAllorder(String dealerId, String customerId, String orderId) {
 		DynamoDbTable<Order> orderTable = getOrderTable();
