@@ -1,5 +1,6 @@
 package com.order.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -79,20 +80,25 @@ public class OrderDbService {
 		} catch (DynamoDbException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
-		//	context.getLogger().log(e.getMessage());
+			// context.getLogger().log(e.getMessage());
 		}
 
 	}
 
 	public boolean checkOrderStatus(OrderDetails orderDetails) {
 
-		context.getLogger().log(orderDetails.getCustomerId() + " " + orderDetails.getOrderId());
+		// context.getLogger().log(orderDetails.getCustomerId() + "_" +
+		// orderDetails.getOrderId());
+		System.out.println(
+				"check order status in orderDb =" + orderDetails.getCustomerId() + "_" + orderDetails.getOrderId());
 		DynamoDbTable<Order> orderTable = getOrderTable();
 		Key key = Key.builder().partitionValue(orderDetails.getDealerId())
-				.sortValue(orderDetails.getCustomerId() + "#" + orderDetails.getOrderId()).build();
-
+				.sortValue(orderDetails.getCustomerId() + "_" + orderDetails.getOrderId()).build();
+		System.out.println("key = " + key.toString());
 		Order item = orderTable.getItem((GetItemEnhancedRequest.Builder request) -> request.key(key));
-		context.getLogger().log(item.getOrderStatus());
+		// context.getLogger().log(item.getOrderStatus());
+		System.out.println("Order Details item = " + item.toString());
+		System.out.println("status =" + item.getOrderStatus());
 
 		if (StringUtils.equals(item.getOrderStatus(), "Order_Received")) {
 			return true;
@@ -164,24 +170,24 @@ public class OrderDbService {
 //
 //	}
 
-	public List<Order> fetchAllorder(String dealerId, String customerId, String orderId) {
+	public List<Order> fetchAllorder(String dealerId, String customerId, String orderId) throws IOException{
 		DynamoDbTable<Order> orderTable = getOrderTable();
-		Key key = Key.builder().partitionValue(dealerId).sortValue(customerId + "#" + orderId).build();
+		Key key = Key.builder().partitionValue(dealerId).sortValue(customerId + "_" + orderId).build();
 		Order item = orderTable.getItem((GetItemEnhancedRequest.Builder requestBuilder) -> requestBuilder.key(key));
 
-		List<Order> list = new ArrayList<>();
+		List list = new ArrayList<>();
 		list.add(item);
 		return list;
 
 	}
 
-	public List<Order> fetchAllorder(String dealerId) {
+	public List<OrderDetails> fetchAllorder(String dealerId) {
 		DynamoDbTable<Order> orderTable = getOrderTable();
 		QueryConditional conditional = QueryConditional.keyEqualTo(Key.builder().partitionValue(dealerId).build());
 		// PageIterable<Order> query =
 		// orderTable.query(QueryEnhancedRequest.builder().queryConditional(conditional).build());
 		Iterator<Order> iterator = orderTable.query(conditional).items().iterator();
-		List<Order> order = new ArrayList<>();
+		List order = new ArrayList<>();
 		while (iterator.hasNext()) {
 			order.add(iterator.next());
 		}

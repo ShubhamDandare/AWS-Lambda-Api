@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Route, Router } from '@angular/router';
+import { NotificationsService } from 'angular2-notifications';
 import { SigninServiceService } from '../signin-service.service';
 
 @Component({
@@ -19,6 +20,10 @@ login(){
     (Response:any)=>{
       console.log(Response);
       sessionStorage.setItem("dealer", JSON.stringify(Response));
+      // if(){
+      //   this.router.navigate(['uploadfile'])
+      // }
+      this.notification.success
       this.router.navigate(['uploadfile'])
       alert("Login Success")
     }
@@ -34,7 +39,7 @@ function(error){
 
 
 
-  constructor(private signinservice:SigninServiceService,private router:Router) { }
+  constructor(private signinservice:SigninServiceService,private router:Router,private notification:NotificationsService) { }
 
   ngOnInit(): void {
   }

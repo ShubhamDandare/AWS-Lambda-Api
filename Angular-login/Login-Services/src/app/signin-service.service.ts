@@ -17,8 +17,8 @@ export class SigninServiceService {
   login(dealer:{username:String,password:String}){
     return this.http.post(this.Login_URL,dealer).pipe(catchError(this.errorHandler))}
 
-    signin(dealer:{username:String,password:String}){
-      return this.http.post(this.Sign_In_URL,dealer)}
+    // signin(dealer:{username:String,password:String}){
+    //   return this.http.post(this.Sign_In_URL,dealer)}
 
     errorHandler(error: HttpErrorResponse) {
       return throwError(error.error.message || 'server Error');

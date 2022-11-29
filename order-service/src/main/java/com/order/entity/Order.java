@@ -23,15 +23,36 @@ public class Order {
 	private String bucketName;
 	private String objectKey;
 	private String orderStatus;
+
 	// @DynamoDBTyped(DynamoDBAttributeType.S)
 //	private Date expectedDeliveryDate;
 //	private double price;
+//
+//	
+//	
+//	public Date getExpectedDeliveryDate() {
+//		return expectedDeliveryDate;
+//	}
+//
+//	public void setExpectedDeliveryDate(Date expectedDeliveryDate) {
+//		this.expectedDeliveryDate = expectedDeliveryDate;
+//	}
+//
+//	public double getPrice() {
+//		return price;
+//	}
+//
+//	public void setPrice(double price) {
+//		this.price = price;
+//	}
 
 	public static final StaticTableSchema.Builder<Order> TABLE_SCHEMA = StaticTableSchema.builder(Order.class)
-			.newItemSupplier(Order::new).addAttribute(String.class, a -> a.name("dealerId").getter(Order::getDealerId)
-					.setter(Order::setDealerId).tags(primaryPartitionKey()));
-//			.addAttribute(String.class, a -> a.name("customerId_OrderId").getter(Order::getCustomerIdAndOrderId)
-//					.setter(Order::setCustomerIdAndOrderId).tags(primarySortKey()));
+			.newItemSupplier(Order::new)
+			.addAttribute(String.class,
+					a -> a.name("dealerId").getter(Order::getDealerId).setter(Order::setDealerId)
+							.tags(primaryPartitionKey()))
+			.addAttribute(String.class, a -> a.name("customerIdAndOrderId").getter(Order::getCustomerIdAndOrderId)
+					.setter(Order::setCustomerIdAndOrderId).tags(primarySortKey()));
 
 //	public Order(String dealerId, String customerIdAndOrderId, String bucketName, String objectKey, String orderStatus,
 //			Date expectedDeliveryDate, double price) {
@@ -72,8 +93,8 @@ public class Order {
 		this.dealerId = dealerId;
 	}
 
-	//@DynamoDbSortKey
-	//@DynamoDbAttribute("customerId_OrderId")
+	@DynamoDbSortKey
+	// @DynamoDbAttribute("customerId_OrderId")
 	public String getCustomerIdAndOrderId() {
 		return customerIdAndOrderId;
 	}

@@ -9,7 +9,7 @@ import { SaveOrderService } from '../save-order.service';
 })
 export class OrderSearchComponent implements OnInit {
   @Input()
-  records : Array <any> = [];
+  list : Array <any> = [];
   customerId :string = "";
   orderId: string = "";
 
@@ -17,12 +17,14 @@ export class OrderSearchComponent implements OnInit {
     const observable = this.orderService.fetchOrders(this.customerId, this.orderId, false);
     observable.subscribe(
         (response: any) => {
+          console.log(response)
           let navigationExtras: NavigationExtras = {
             state: {
-              records: response
+              list: response
             }
           };
-       alert('orders fetch successfully'+response)
+       alert('orders fetch successfully')
+       this.router.navigate(['orderlist'], navigationExtras);
       } ,(error) => {
         alert(error);
       }

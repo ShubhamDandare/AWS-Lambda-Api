@@ -26,8 +26,8 @@ public class InitiateOrder {
 		List<Order> scanOrderStatus = service.scanOrderStatus();
 
 		scanOrderStatus.forEach((order) -> {
-			String customerId = order.getCustomerIdAndOrderId().split("#")[0];
-			String orderId = order.getCustomerIdAndOrderId().split("#")[1];
+			String customerId = order.getCustomerIdAndOrderId().split("_")[0];
+			String orderId = order.getCustomerIdAndOrderId().split("_")[1];
 			sqsService.sendToSQS(order.getDealerId(), customerId, orderId, order.getBucketName(), order.getObjectKey());
 			service.updateOrder(order.getDealerId(), order.getCustomerIdAndOrderId());
 		});

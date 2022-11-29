@@ -35,6 +35,10 @@ export class OrderUpdateComponent implements OnInit {
   }
   constructor(private  orderService:SaveOrderService, private router: Router) { }
 
+  getOrder(){
+    
+  }
+
   ngOnInit(): void {
   }
 

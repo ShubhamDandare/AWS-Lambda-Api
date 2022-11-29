@@ -17,11 +17,10 @@ import com.order.service.S3Service;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.s3.S3Client;
 
-public class FetchAllOrder implements RequestHandler<OrderRequest, List<Order>> {
+public class FetchAllOrder implements RequestHandler<OrderRequest, List<OrderDetails>> {
 
 	private final DynamoDbClient dynamoDbClient;
 	private final S3Client s3Client;
-	
 
 	public FetchAllOrder() {
 		dynamoDbClient = DependencyFactory.dynamoDbClient();
@@ -29,29 +28,28 @@ public class FetchAllOrder implements RequestHandler<OrderRequest, List<Order>> 
 	}
 
 	@Override
-	public List<Order> handleRequest(OrderRequest input, Context context) {
+	public List<OrderDetails> handleRequest(OrderRequest input, Context context) {
 
 		OrderDbService dbService = new OrderDbService(dynamoDbClient, context);
 		S3Service s3Service = new S3Service(s3Client, context);
+		context.getLogger().log("fetching order =:" + input.toString());
 		List<Order> fetchAllorder;
-		List<Order> list = new ArrayList<>();
-		if (input.isShowAll()) {
-			fetchAllorder = dbService.fetchAllorder(input.getDealerId());
-		} else {
+		List<OrderDetails> list = new ArrayList<>();
+		try {
 			fetchAllorder = dbService.fetchAllorder(input.getDealerId(), input.getCustomerId(), input.getOrderId());
-		}
-		fetchAllorder.forEach((order) -> {
-			try {
 
-				Order fetchOrderfromS3 = s3Service.fetchOrderfromS3(order.getBucketName(), order.getObjectKey());
+			System.out.println("ALL ORDER =" + fetchAllorder.toString());
+			for (Order order : fetchAllorder) {
+
+				OrderDetails fetchOrderfromS3 = s3Service.fetchOrderfromS3(order.getBucketName(), order.getObjectKey());
+				System.out.println("fetchOrderfromS3 = " + fetchOrderfromS3.toString());
 				list.add(fetchOrderfromS3);
-			} catch (IOException e) {
 
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-		});
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("exception occour =" + e.getMessage());
+		}
 		return list;
 	}
-
 }

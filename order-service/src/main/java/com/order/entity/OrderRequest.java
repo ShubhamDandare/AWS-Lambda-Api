@@ -52,6 +52,11 @@ public class OrderRequest {
 	public void setObjectKey(String objectKey) {
 		this.objectKey = objectKey;
 	}
+	@Override
+	public String toString() {
+		return "OrderRequest [dealerId=" + dealerId + ", orderId=" + orderId + ", customerId=" + customerId
+				+ ", objectKey=" + objectKey + ", showAll=" + showAll + "]";
+	}
 	
 	
 	

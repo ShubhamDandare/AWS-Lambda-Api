@@ -40,6 +40,10 @@ export class SaveOrderService {
     return this.http.put(this.BASE_URL + '/updateorder', order).pipe(catchError(this.errorHandler));
   }
 
+  // getOrder(order: any) {
+  //   return this.http.put(this.BASE_URL + '/updateorder', order).pipe(catchError(this.errorHandler));
+  // }
+
   fetchOrders(customerId : string , orderId : string, showAll : Boolean) {
     const orderInput = {
       "customerId":customerId,
@@ -47,6 +51,7 @@ export class SaveOrderService {
       "dealerId":this.dealer.id,
       "showAll": showAll
     }
+    console.log("orderinput ="+orderInput)
     return this.http.post(this.BASE_URL+'/orderlist', orderInput).pipe(catchError(this.errorHandler));
   }
 

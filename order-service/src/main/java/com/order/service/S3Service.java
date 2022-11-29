@@ -3,7 +3,7 @@ package com.order.service;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.gson.Gson;
@@ -52,18 +52,26 @@ public class S3Service {
 	}
 
 	// fetch file
-	public Order fetchOrderfromS3(String bucketname, String objectKey) throws IOException {
+	public OrderDetails fetchOrderfromS3(String bucketname, String objectKey) throws IOException {
+		System.out.println("BUCKETNAME =" + bucketname + " OBJECTKEY =" + objectKey);
 
 		try {
 			GetObjectRequest getObjectRequest = GetObjectRequest.builder().key(objectKey).bucket(bucketname).build();
 			ResponseInputStream<GetObjectResponse> object = s3Client.getObject(getObjectRequest);
+
 			InputStream stream = new ByteArrayInputStream(object.readAllBytes());
+
+//			 System.out.println("Content :" + new String(object.readAllBytes(),
+//			 StandardCharsets.UTF_8));
+//			 System.out.println("stream = " + stream.toString());
 			String utf8String = IoUtils.toUtf8String(stream);
-			return gson.fromJson(utf8String, Order.class);
+		//	System.out.println("utf8String = " + utf8String.toString());
+			return gson.fromJson(utf8String.toString(), OrderDetails.class);
 
 		} catch (IOException e) {
 
 			e.printStackTrace();
+			context.getLogger().log("Exception while reading order from s3: " + e.getMessage());
 			throw new IOException("fail to fetch s3 object");
 		}
 

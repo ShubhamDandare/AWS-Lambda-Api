@@ -14,6 +14,7 @@ import { OrderDashboardComponent } from './order-dashboard/order-dashboard.compo
 import { CsvparserComponent } from './csvparser/csvparser.component';
 import { OrderUpdateComponent } from './order-update/order-update.component';
 import { OrderSearchComponent } from './order-search/order-search.component';
+import { OrderListComponent } from './order-list/order-list.component';
 //import { NgxCsvParserModule } from 'ngx-csv-parser';
 //import { NgxCsvParserModule } from 'ngx-csv-parser';
 // import { OrderSubmissionComponent } from './order-submission/order-submission.component';
@@ -30,7 +31,8 @@ import { OrderSearchComponent } from './order-search/order-search.component';
     OrderDashboardComponent,
     CsvparserComponent,
     OrderUpdateComponent,
-    OrderSearchComponent
+    OrderSearchComponent,
+    OrderListComponent
   ],
   imports: [
     BrowserModule,

@@ -150,6 +150,14 @@ public class OrderDetails {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+
+	@Override
+	public String toString() {
+		return "OrderDetails [orderId=" + orderId + ", customerId=" + customerId + ", dealerId=" + dealerId + ", model="
+				+ model + ", make=" + make + ", year=" + year + ", fuelType=" + fuelType + ", customerName="
+				+ customerName + ", city=" + city + ", orderStatus=" + orderStatus + ", expectedDeliveryDate="
+				+ expectedDeliveryDate + ", price=" + price + "]";
+	}
 	
 
 }

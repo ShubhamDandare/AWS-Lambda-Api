@@ -26,7 +26,7 @@ public class UpdateOrder implements RequestHandler<OrderDetails, OrderDetails>{
 	public OrderDetails handleRequest(OrderDetails input, Context context) {
 		OrderDbService service = new OrderDbService(dynamoDbClient, context);
 		S3Service s3Service = new S3Service(s3Client, context);
-		context.getLogger().log("order update data deatils ="+input);
+		context.getLogger().log("order update data deatils ="+input.toString());
 		boolean checkOrderStatus = service.checkOrderStatus(input);
 		if(checkOrderStatus) {
 			s3Service.saveObjToS3(input);

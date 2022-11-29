@@ -24,7 +24,24 @@ export class OrderDashboardComponent implements OnInit {
     };
     this.router.navigate(['updateorder'], navigationExtras);
   }
-  
+  fetchOrder(){
+    this.router.navigate(['searchorder']);
+  }
+  showAll(){
+    const observable = this.service.fetchOrders("", "", true);
+    observable.subscribe(
+        (response: any) => {
+        let navigationExtras: NavigationExtras = {
+          state: {
+            convertedToOrder: response
+          }
+        };
+        this.router.navigate(['orderlist'], navigationExtras);
+      } ,(error) => {
+      alert(error);
+      }
+    )
+  }
   constructor(private router : Router, private service :SaveOrderService) {
     if(history.state.convertedToOrder){
       this.convertedToOrder = history.state.convertedToOrder;
