@@ -23,9 +23,9 @@ login(){
       // if(){
       //   this.router.navigate(['uploadfile'])
       // }
-      this.notification.success
+      //this.notification.success("Login Success")
       this.router.navigate(['uploadfile'])
-      alert("Login Success")
+     // alert("Login Success")
     }
 ,
 function(error){
@@ -39,7 +39,7 @@ function(error){
 
 
 
-  constructor(private signinservice:SigninServiceService,private router:Router,private notification:NotificationsService) { }
+  constructor(private signinservice:SigninServiceService,private router:Router) { }
 
   ngOnInit(): void {
   }

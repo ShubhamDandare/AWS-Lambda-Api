@@ -12,43 +12,9 @@ import { Observable, ReplaySubject } from 'rxjs';
   styleUrls: ['./signin.component.css']
 })
 export class SigninComponent implements OnInit{
-  fileContent : string | undefined;
+  
 
-  onFileSelected(event : any) {
-    this.convertFile(event.target.files[0]).subscribe((base64: string | undefined) => {
-      this.fileContent = base64;
-      console.log(this.fileContent )
-      
-      this.uploadFile();
-    });
-  }
-
-  uploadFile() {
-    const observable = this.orderService.uploadFile(this.fileContent) ;
-      observable.subscribe(
-        (response : any) => {
-          console.log('response***********'+response)
-          let navigationExtras: NavigationExtras = {
-            state: {
-              ordersList: response
-            }
-          };
-          this.router.navigate(['orderdashboard'], navigationExtras);
-         alert("File upload Success");
-        },(error) => {
-          alert(error);
-        }
-      )
-    
-  }
-
-  convertFile(file : File) : Observable<string> {
-    const result = new ReplaySubject<string>(1);
-    const reader = new FileReader();
-    reader.readAsBinaryString(file);
-    reader.onload = (event:any) => result.next(btoa(event.target.result.toString()));
-    return result;
-  }
+  
 
   constructor(private  orderService: SaveOrderService,
     private router: Router) { }

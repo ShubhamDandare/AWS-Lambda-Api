@@ -11,7 +11,7 @@ import { SaveOrderService } from '../save-order.service';
 })
 export class OrderDashboardComponent implements OnInit {
   convertedToOrder : Array <any> = [];
-  
+  // isprofileActivate :false | undefined;
   uploadFile() {
     this.router.navigate(['uploadfile']);
   }
