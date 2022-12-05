@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuardService } from './auth-guard.service';
 import { CsvparserComponent } from './csvparser/csvparser.component';
 import { HeaderComponent } from './header/header.component';
 import { LoginComponent } from './login/login.component';
@@ -17,12 +18,12 @@ const routes: Routes = [
   { path: 'signin', component: SigninComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'uploadfile', component: OrderSubmissionComponent },
-  { path: 'orderdashboard', component: OrderDashboardComponent },
+  { path: 'uploadfile', component: OrderSubmissionComponent,canActivate: [AuthGuardService] },
+  { path: 'orderdashboard', component: OrderDashboardComponent,canActivate: [AuthGuardService] },
   { path: 'csv', component: CsvparserComponent },
-  { path: 'updateorder', component: OrderUpdateComponent },
-  { path: 'searchorder', component: OrderSearchComponent },
-  { path: 'orderlist', component: OrderListComponent }
+  { path: 'updateorder', component: OrderUpdateComponent,canActivate: [AuthGuardService] },
+  { path: 'searchorder', component: OrderSearchComponent,canActivate: [AuthGuardService] },
+  { path: 'orderlist', component: OrderListComponent,canActivate: [AuthGuardService] }
 ];
 
 @NgModule({

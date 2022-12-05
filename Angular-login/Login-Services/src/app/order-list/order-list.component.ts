@@ -8,10 +8,10 @@ import { NavigationExtras, Router } from '@angular/router';
 })
 export class OrderListComponent implements OnInit {
   @Input()
-  list : Array <any> = [];
+  convertedToOrder : Array <any> = [];
   constructor(private router : Router) { 
-    if(history.state.list.length > 0 ){
-      this.list = history.state.list;
+    if(history.state.convertedToOrder){
+      this.convertedToOrder = history.state.convertedToOrder;
     }
   }
 

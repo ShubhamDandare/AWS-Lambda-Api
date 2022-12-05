@@ -94,9 +94,9 @@ public class OrderDbService {
 		DynamoDbTable<Order> orderTable = getOrderTable();
 		Key key = Key.builder().partitionValue(orderDetails.getDealerId())
 				.sortValue(orderDetails.getCustomerId() + "_" + orderDetails.getOrderId()).build();
-		System.out.println("key = " + key.toString());
+		
 		Order item = orderTable.getItem((GetItemEnhancedRequest.Builder request) -> request.key(key));
-		// context.getLogger().log(item.getOrderStatus());
+		
 		System.out.println("Order Details item = " + item.toString());
 		System.out.println("status =" + item.getOrderStatus());
 
@@ -181,7 +181,7 @@ public class OrderDbService {
 
 	}
 
-	public List<OrderDetails> fetchAllorder(String dealerId) {
+	public List<Order> fetchAllorder(String dealerId) {
 		DynamoDbTable<Order> orderTable = getOrderTable();
 		QueryConditional conditional = QueryConditional.keyEqualTo(Key.builder().partitionValue(dealerId).build());
 		// PageIterable<Order> query =

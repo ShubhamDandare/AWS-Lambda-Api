@@ -56,6 +56,7 @@ public class S3Service {
 		System.out.println("BUCKETNAME =" + bucketname + " OBJECTKEY =" + objectKey);
 
 		try {
+			
 			GetObjectRequest getObjectRequest = GetObjectRequest.builder().key(objectKey).bucket(bucketname).build();
 			ResponseInputStream<GetObjectResponse> object = s3Client.getObject(getObjectRequest);
 
@@ -64,7 +65,7 @@ public class S3Service {
 //			 System.out.println("Content :" + new String(object.readAllBytes(),
 //			 StandardCharsets.UTF_8));
 //			 System.out.println("stream = " + stream.toString());
-			String utf8String = IoUtils.toUtf8String(stream);
+			String utf8String = IoUtils.toUtf8String(stream); 
 		//	System.out.println("utf8String = " + utf8String.toString());
 			return gson.fromJson(utf8String.toString(), OrderDetails.class);
 

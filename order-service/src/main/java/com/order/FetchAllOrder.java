@@ -34,22 +34,26 @@ public class FetchAllOrder implements RequestHandler<OrderRequest, List<OrderDet
 		S3Service s3Service = new S3Service(s3Client, context);
 		context.getLogger().log("fetching order =:" + input.toString());
 		List<Order> fetchAllorder;
-		List<OrderDetails> list = new ArrayList<>();
+		List<OrderDetails> orderdetail = new ArrayList<>();
 		try {
+			if(input.isShowAll()) {
+				fetchAllorder=dbService.fetchAllorder(input.getDealerId());
+			}else {
 			fetchAllorder = dbService.fetchAllorder(input.getDealerId(), input.getCustomerId(), input.getOrderId());
-
-			System.out.println("ALL ORDER =" + fetchAllorder.toString());
+			}
+			//System.out.println("ALL ORDER =" + fetchAllorder.toString());
 			for (Order order : fetchAllorder) {
 
 				OrderDetails fetchOrderfromS3 = s3Service.fetchOrderfromS3(order.getBucketName(), order.getObjectKey());
-				System.out.println("fetchOrderfromS3 = " + fetchOrderfromS3.toString());
-				list.add(fetchOrderfromS3);
+			//	System.out.println("fetchOrderfromS3 = " + fetchOrderfromS3.toString());
+				orderdetail.add(fetchOrderfromS3);
 
 			}
+			System.out.println("ALL LIST ="+orderdetail);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("exception occour =" + e.getMessage());
 		}
-		return list;
+		return orderdetail;
 	}
 }

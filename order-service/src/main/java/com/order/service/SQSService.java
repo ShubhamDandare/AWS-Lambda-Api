@@ -8,6 +8,7 @@ import com.order.exception.SendSQSException;
 
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
 import software.amazon.awssdk.services.sqs.model.SqsException;
 
 public class SQSService {
@@ -16,7 +17,7 @@ public class SQSService {
 	private final Context context;
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 	//todo update sqs_url url 
-	private final String SQS_URL = "";
+	private final String SQS_URL = "https://sqs.ap-northeast-1.amazonaws.com/251398461438/sgd-queue";
 
 	public SQSService(SqsClient sqsClient, Context context) {
 		this.sqsClient = sqsClient;
@@ -34,8 +35,10 @@ public class SQSService {
 			obj.addProperty("bucketName", bucketName);
 			obj.addProperty("objectKey", objectKey);
 
-			sqsClient.sendMessage(SendMessageRequest.builder().queueUrl(SQS_URL).messageBody(gson.toJson(obj))
+			SendMessageResponse sendMessage = sqsClient.sendMessage(SendMessageRequest.builder().queueUrl(SQS_URL).messageBody(gson.toJson(obj))
 					.messageGroupId("ProcessOrder").build());
+			System.out.println("SQS SEND MSG ="+sendMessage.toString());
+			System.out.println("SQS SEND MSG ID ="+sendMessage.messageId());
 
 		} catch (SqsException e) {
 			throw new SendSQSException("SQS message fail to send");

@@ -9,7 +9,7 @@ import { SaveOrderService } from '../save-order.service';
 })
 export class OrderSearchComponent implements OnInit {
   @Input()
-  list : Array <any> = [];
+  convertedToOrder : Array <any> = [];
   customerId :string = "";
   orderId: string = "";
 
@@ -20,7 +20,7 @@ export class OrderSearchComponent implements OnInit {
           console.log(response)
           let navigationExtras: NavigationExtras = {
             state: {
-              list: response
+              convertedToOrder: response
             }
           };
        alert('orders fetch successfully')

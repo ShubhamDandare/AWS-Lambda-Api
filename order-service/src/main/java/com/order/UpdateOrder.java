@@ -2,6 +2,7 @@ package com.order;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.order.entity.Order;
 import com.order.entity.OrderDetails;
 import com.order.exception.OrderUpdateException;
 import com.order.service.OrderDbService;
@@ -28,8 +29,11 @@ public class UpdateOrder implements RequestHandler<OrderDetails, OrderDetails>{
 		S3Service s3Service = new S3Service(s3Client, context);
 		context.getLogger().log("order update data deatils ="+input.toString());
 		boolean checkOrderStatus = service.checkOrderStatus(input);
+		context.getLogger().log("STATUS ="+checkOrderStatus);
 		if(checkOrderStatus) {
-			s3Service.saveObjToS3(input);
+			Order saveObjToS3 = s3Service.saveObjToS3(input);
+			
+			context.getLogger().log("saveObjToS3  ="+saveObjToS3);
 		}
 		else {
 			throw new OrderUpdateException("fail to update order");

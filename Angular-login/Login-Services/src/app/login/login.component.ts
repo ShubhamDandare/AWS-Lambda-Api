@@ -25,7 +25,7 @@ login(){
       // }
       //this.notification.success("Login Success")
       this.router.navigate(['uploadfile'])
-     // alert("Login Success")
+      alert("Login Success")
     }
 ,
 function(error){

@@ -15,6 +15,9 @@ import { CsvparserComponent } from './csvparser/csvparser.component';
 import { OrderUpdateComponent } from './order-update/order-update.component';
 import { OrderSearchComponent } from './order-search/order-search.component';
 import { OrderListComponent } from './order-list/order-list.component';
+import { RouterModule } from '@angular/router';
+import { SimpleNotificationsModule } from 'angular2-notifications';
+import { AuthGuardService } from './auth-guard.service';
 //import { NgxCsvParserModule } from 'ngx-csv-parser';
 //import { NgxCsvParserModule } from 'ngx-csv-parser';
 // import { OrderSubmissionComponent } from './order-submission/order-submission.component';
@@ -38,12 +41,10 @@ import { OrderListComponent } from './order-list/order-list.component';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-  
-
-    HttpClientModule
-     
+    HttpClientModule,
+    SimpleNotificationsModule.forRoot({ timeOut: 3500})
   ],
-  providers: [],
+  providers: [AuthGuardService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

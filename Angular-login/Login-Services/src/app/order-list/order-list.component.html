@@ -1,5 +1,5 @@
 <p>order-list works!</p>
-<div class="list" *ngIf="list.length > 0">
+<div class="convertedToOrder" *ngIf="convertedToOrder.length > 0">
     <br/>
     <h3>fetch order</h3>
     <table class="table table-striped table-bordered">
@@ -18,7 +18,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let order of list">
+            <tr *ngFor="let order of convertedToOrder">
                 <td>{{order.make}}</td>
                 <td>{{order.model}}</td>
                 <td>{{order.year}}</td>
